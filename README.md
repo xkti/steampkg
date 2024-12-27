@@ -9,7 +9,7 @@
 
 Due to (not-so) recent changes to Steam's authentication process, config.vdf files obtained from the desktop version of Steam will no longer work. **Please login via SteamCMD and use its config.vdf file instead.**
 
-Unlike other tools, steampkg utilises *cached credentials* obtained from Steam's config.vdf file. Only three keys are actually required, however: Accounts, MTBF, ConnectCache. These values would then be made into a new file, `accounts/<your username>.vdf`, located in the same directory as the script.
+Unlike other tools, steampkg utilises *cached credentials* obtained from Steam's config.vdf file. Only three keys are actually required, however: Accounts, MTBF, ConnectCache. These values would then be made into a new file, `<your username>.vdf`, located in the `accounts` directory.
 
 Example account config (could be either tab or space-separated):
 
