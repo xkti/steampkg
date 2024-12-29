@@ -154,20 +154,26 @@ function download {
   [[ "${x}" ]] && : || x="64"
   # If no language is set, set to english because blank breaks it
   [[ "${lang}" ]] && : || lang="english"
-  # SteamCMD handles beta branches weirdly. If a branch is set, it will
-  # download said branch. If you run the script again, but with no branch
-  # set (assuming NUKE is off), it will think that branch is still set and
-  # it will download that branch. However, if you call -beta with a space
-  # as its flag, it will unset the configured branch and download the default
-  # branch available. That is what this if statement does.
-  [[ "${b}" ]] && : || b=" "
-  # If branch password is set, run with -betapassword called
-  if [[ "${c}" ]]; then
+  # Branch handling
+  # If beta and betapassword is called...
+  if [[ "${b}" ]] && [[ "${c}" ]]; then
     unbuffer "${STEAMROOT}/steamcmd.sh" +login "${u}" +@sSteamCmdForcePlatformType "${p}" +@sSteamCmdForcePlatformBitness "${x}" +app_update "${i}" -validate -language "${lang}" -beta "${b}" -betapassword "${c}" +quit | grep -iE ${steamRegex}
     EXITCODE="${PIPESTATUS[0]}"
     errorcheck
-  else
+  # If only beta is called...
+  elif [[ "${b}" ]]; then
     unbuffer "${STEAMROOT}/steamcmd.sh" +login "${u}" +@sSteamCmdForcePlatformType "${p}" +@sSteamCmdForcePlatformBitness "${x}" +app_update "${i}" -validate -language "${lang}" -beta "${b}" +quit | grep -iE ${steamRegex}
+    EXITCODE="${PIPESTATUS[0]}"
+    errorcheck
+  # If beta isn't called...
+  else
+    # If appmanifest exists, delete BetaKey line from it
+    # Once branch is set, it's apparently not possible to reset it
+    # back to default without manually removing it from acf.
+    if [[ -f "${STEAMROOT}/steamapps/appmanifest_${i}.acf" ]]; then
+      sed -i '/BetaKey/d' "${STEAMROOT}/steamapps/appmanifest_${i}.acf"
+    fi
+    unbuffer "${STEAMROOT}/steamcmd.sh" +login "${u}" +@sSteamCmdForcePlatformType "${p}" +@sSteamCmdForcePlatformBitness "${x}" +app_update "${i}" -validate -language "${lang}" +quit | grep -iE ${steamRegex}
     EXITCODE="${PIPESTATUS[0]}"
     errorcheck
   fi
